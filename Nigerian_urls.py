@@ -32,7 +32,7 @@ def initialize_driver():
     return driver
 
 def scrape_property_details(driver):
-    details_tab = WebDriverWait(driver, 120).until(
+    details_tab = WebDriverWait(driver, 360).until(
         EC.element_to_be_clickable((By.CSS_SELECTOR, 'ul.tabs li a[href="#tab-1"]'))
     )
     details_tab.click()
@@ -86,7 +86,7 @@ def harvest_apartments(start_url: str):
 
         # Wait for an element to be present (e.g., a specific element with a CSS selector)
         try:
-            WebDriverWait(driver, 120).until(
+            WebDriverWait(driver, 360).until(
                 EC.presence_of_element_located((By.XPATH, "//ul[@role='navigation']/li[last()-1]/a"))
             )
             print("Element found, page is ready!")
@@ -110,7 +110,7 @@ def harvest_apartments(start_url: str):
             driver.get(page_url)
 # Wait for an element to be present (e.g., a specific element with a CSS selector)
             try:
-                WebDriverWait(driver, 120).until(
+                WebDriverWait(driver, 360).until(
                     EC.presence_of_element_located((By.XPATH, "//ul[@role='navigation']/li[last()-1]/a"))
                 )
                 print("Element found, page is ready!")
@@ -123,14 +123,14 @@ def harvest_apartments(start_url: str):
             for block in page_blocks:
                 try:
                     # locate the link inside the block
-                    link_elem = WebDriverWait(block, 120).until(
+                    link_elem = WebDriverWait(block, 360).until(
                         EC.presence_of_element_located((By.CSS_SELECTOR, "a"))
                     )
                     link_href = link_elem.get_attribute("href")
 
                     # open property in same tab
                     driver.execute_script("arguments[0].click();", link_elem)
-                    WebDriverWait(driver, 120).until(
+                    WebDriverWait(driver,360).until(
                         EC.presence_of_element_located((By.CSS_SELECTOR, ".property-details"))
                     )
 
@@ -147,7 +147,7 @@ def harvest_apartments(start_url: str):
                     yield json.dumps({"error": f"failed on listing: {str(e)}"}) + "\n"
                 finally:
                     driver.back()
-                    WebDriverWait(driver, 120).until(
+                    WebDriverWait(driver, 360).until(
                         EC.presence_of_all_elements_located((By.CLASS_NAME, "wp-block-body"))
                     )
 
