@@ -101,9 +101,9 @@ def harvest_apartments(start_url: str, max_pages: int=25):
         last_page_number = int(driver.find_element(By.XPATH, "//ul[@role='navigation']/li[last()-1]/a").text)
         print(last_page_number)
         #last_page_number = 1  # demo
+        current_page = 1
 
         while True:
-            current_page = 1
             last_page_number = int(driver.find_element(By.XPATH, "//ul[@role='navigation']/li[last()-1]/a").text)
 
             # --- build page URL correctly ---
