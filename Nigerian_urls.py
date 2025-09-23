@@ -32,10 +32,15 @@ def initialize_driver():
     return driver
 
 def scrape_property_details(driver):
-    details_tab = WebDriverWait(driver, 360).until(
+    details_tab = driver.find_element(By.CSS_SELECTOR, 'ul.tabs li a[href="#tab-1"]')
+    """
+    WebDriverWait(driver, 360).until(
         EC.element_to_be_clickable((By.CSS_SELECTOR, 'ul.tabs li a[href="#tab-1"]'))
     )
-    details_tab.click()
+    """
+    driver.execute_script("arguments[0].scrollIntoView(true);", details_tab)
+
+    driver.execute_script("arguments[0].click();", details_tab)
     data = {
         "description": "",
         "details": {}
@@ -68,13 +73,15 @@ def scrape_property_details(driver):
                     value = cell.text.replace(strongs[0].text, "").strip(" :\n\t")
                     if key:
                         details[key] = value if value else None
+                    current_url = driver.current_url
+                    details["current_url"] = current_url # getting house url directly
         data["details"] = details
     except NoSuchElementException:
         data["details"] = {}
 
     return data
-
-def harvest_apartments(start_url: str):
+# harvest specific number of pages or all pages(25)
+def harvest_apartments(start_url: str, max_pages: int=25):
     """
     Generator that streams apartment data page by page.
     """
@@ -151,7 +158,7 @@ def harvest_apartments(start_url: str):
                         EC.presence_of_all_elements_located((By.CLASS_NAME, "wp-block-body"))
                     )
 
-            if current_page >= last_page_number:
+            if current_page >= last_page_number or current_page >= max_pages: 
                 break
             else:
                 current_page +=1
@@ -160,12 +167,16 @@ def harvest_apartments(start_url: str):
 
 
 @app.get("/scrape")
-def scrape(url: str = Query(..., description="Listing URL to scrape")):
+def scrape(
+    url: str = Query(..., description="Listing URL to scrape"),
+    max_page: int = Query(25, description="Maximum number of pages to scrape")  #  default = 25
+):
+
     """
     Call:  GET /scrape?url=https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos?q=for-rent+flats-apartments+lagos&
     Streams apartments one-by-one as JSON lines.
     """
-    return StreamingResponse(harvest_apartments(url), media_type="application/json")
+    return StreamingResponse(harvest_apartments(url, max_page), media_type="application/json")
 
 
 
