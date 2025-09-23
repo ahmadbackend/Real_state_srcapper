@@ -11,11 +11,9 @@ from selenium.common.exceptions import NoSuchElementException
 from fastapi import FastAPI, Query
 from fastapi.responses import StreamingResponse
 
-import  pandas as pd
-import decouple
 app = FastAPI()
 
-url = "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos?q=for-rent+flats-apartments+lagos&"
+#url = "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos?q=for-rent+flats-apartments+lagos&"
 
 def initialize_driver():
     chrome_options = webdriver.ChromeOptions()
@@ -34,7 +32,7 @@ def initialize_driver():
     return driver
 
 def scrape_property_details(driver):
-    details_tab = WebDriverWait(driver, 10).until(
+    details_tab = WebDriverWait(driver, 120).until(
         EC.element_to_be_clickable((By.CSS_SELECTOR, 'ul.tabs li a[href="#tab-1"]'))
     )
     details_tab.click()
@@ -85,8 +83,15 @@ def harvest_apartments(start_url: str):
 
     try:
         driver.get(start_url)
-        time.sleep(2)
 
+        # Wait for an element to be present (e.g., a specific element with a CSS selector)
+        try:
+            WebDriverWait(driver, 120).until(
+                EC.presence_of_element_located((By.XPATH, "//ul[@role='navigation']/li[last()-1]/a"))
+            )
+            print("Element found, page is ready!")
+        except:
+            print("Element not found within 30 seconds, proceeding anyway or handling error.")
         # detect last page if needed
         last_page_number = int(driver.find_element(By.XPATH, "//ul[@role='navigation']/li[last()-1]/a").text)
         print(last_page_number)
@@ -103,22 +108,29 @@ def harvest_apartments(start_url: str):
                 page_url = f"{start_url}?page={current_page}"
 
             driver.get(page_url)
-            time.sleep(2)
-
+# Wait for an element to be present (e.g., a specific element with a CSS selector)
+            try:
+                WebDriverWait(driver, 120).until(
+                    EC.presence_of_element_located((By.XPATH, "//ul[@role='navigation']/li[last()-1]/a"))
+                )
+                print("Element found, page is ready!")
+            except:
+                print("Element not found within 30 seconds, proceeding anyway or handling error.")
+    # Optionally, handle the timeout (e.g., exit or retry)
             page_blocks = driver.find_elements(By.CLASS_NAME, "wp-block-body")
-            print(f"Found {len(page_blocks)} listings on page {page}", flush=True)
+            print(f"Found {len(page_blocks)} listings on page {current_page}", flush=True)
 
             for block in page_blocks:
                 try:
                     # locate the link inside the block
-                    link_elem = WebDriverWait(block, 5).until(
+                    link_elem = WebDriverWait(block, 120).until(
                         EC.presence_of_element_located((By.CSS_SELECTOR, "a"))
                     )
                     link_href = link_elem.get_attribute("href")
 
                     # open property in same tab
                     driver.execute_script("arguments[0].click();", link_elem)
-                    WebDriverWait(driver, 5).until(
+                    WebDriverWait(driver, 120).until(
                         EC.presence_of_element_located((By.CSS_SELECTOR, ".property-details"))
                     )
 
@@ -135,7 +147,7 @@ def harvest_apartments(start_url: str):
                     yield json.dumps({"error": f"failed on listing: {str(e)}"}) + "\n"
                 finally:
                     driver.back()
-                    WebDriverWait(driver, 5).until(
+                    WebDriverWait(driver, 120).until(
                         EC.presence_of_all_elements_located((By.CLASS_NAME, "wp-block-body"))
                     )
 
@@ -147,17 +159,6 @@ def harvest_apartments(start_url: str):
         driver.quit()
 
 
-import json
-import time
-"""
-def harvest_apartments(url: str):
-    print("Starting harvest for:", url, flush=True)  # visible in terminal
-    for i in range(5):                               # simulate 5 apartments
-        apartment = {"id": i, "name": f"Apartment {i}"}
-        yield json.dumps(apartment) + "\n"           # << MUST yield a string/bytes
-        time.sleep(1)                                # simulate scraping delay
-    print("Harvest finished", flush=True)
-"""
 @app.get("/scrape")
 def scrape(url: str = Query(..., description="Listing URL to scrape")):
     """
@@ -166,38 +167,6 @@ def scrape(url: str = Query(..., description="Listing URL to scrape")):
     """
     return StreamingResponse(harvest_apartments(url), media_type="application/json")
 
-"""
-driver = initialize_driver()
-
-last_page_number = 719#int(driver.find_element(By.XPATH, "//ul[@class='pagination']/li[last()-1]/a").text) # get the last page number
-
-# scrap first page where no page query
-for page in range(1, last_page_number +1):
-    driver.get(url + f"page={page}") # construct url dynamically
-    time.sleep(4)
-    count = 0
-    tries_to_collect_property = 3
-    page_blocks = driver.find_elements(By.CLASS_NAME, "wp-block-body")
-    for block in  range(len(page_blocks)):
-        try:
-
-            detail_link = WebDriverWait(page_blocks[block], 30).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, 'a'))
-            )
-            detail_link.click()
-            time.sleep(3)
-            apartment = scrape_property_details(driver)
-            print(count)
-            count+=1
-            tries_to_collect_property = 3 # reset to 3 when success
-        except Exception as e:
-            print("failed to reach the details of this item")
-            if tries_to_collect_property >0 :
-                block -=1 # retry same one again
-                tries_to_collect_property -=1
-
-        driver.back()
-"""
 
 
 
