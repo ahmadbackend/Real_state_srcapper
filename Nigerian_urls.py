@@ -151,12 +151,14 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                         block -= 1
                         max_tries -=1
                     else:
-                        apartments.append({"error": f"failed on listing {block + 1} of page {current_page}: {str(e)}"})                finally:
-                driver.back()
-                WebDriverWait(driver, 360).until(
-                    EC.presence_of_all_elements_located((By.CLASS_NAME, "wp-block-body"))
-                )
-                time.sleep(3)
+                        apartments.append({"error": f"failed on listing {block + 1} of page {current_page}: {str(e)}"}) 
+                finally:
+
+                    driver.back()
+                    WebDriverWait(driver, 360).until(
+                        EC.presence_of_all_elements_located((By.CLASS_NAME, "wp-block-body"))
+                    )
+                    time.sleep(3)
 
             if current_page >= last_page_number or current_page >= max_pages: 
                 break
@@ -164,6 +166,7 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                 current_page +=1
     finally:
         driver.quit()
+    return apartments  # Don't forget to return the results!
 
 
 @app.get("/scrape")
