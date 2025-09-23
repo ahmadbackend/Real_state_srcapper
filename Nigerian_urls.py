@@ -113,24 +113,25 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                 page_url = f"{start_url}&page={current_page}"
             else:
                 page_url = f"{start_url}?page={current_page}"
-
-            driver.get(page_url)
-# Wait for an element to be present (e.g., a specific element with a CSS selector)
+            driver.get(start_url)
+            # Wait for an element to be present (e.g., a specific element with a CSS selector)
             try:
                 WebDriverWait(driver, 360).until(
                     EC.presence_of_element_located((By.XPATH, "//ul[@role='navigation']/li[last()-1]/a"))
                 )
                 print("Element found, page is ready!")
             except:
-                print("Element not found within 30 seconds, proceeding anyway or handling error.")
-    # Optionally, handle the timeout (e.g., exit or retry)
+                print("Element not found within 360 seconds, proceeding anyway or handling error.")
+            # Optionally, handle the timeout (e.g., exit or retry)
             page_blocks = driver.find_elements(By.CLASS_NAME, "wp-block-body")
             print(f"Found {len(page_blocks)} listings on page {current_page}", flush=True)
 
-            for block in page_blocks:
+            for block in range(len(page_blocks)):
                 try:
+                    page_blocks = driver.find_elements(By.CLASS_NAME, "wp-block-body")
+
                     # locate the link inside the block
-                    link_elem = WebDriverWait(block, 360).until(
+                    link_elem = WebDriverWait(page_blocks[block], 360).until(
                         EC.presence_of_element_located((By.CSS_SELECTOR, "a"))
                     )
                     link_href = link_elem.get_attribute("href")
@@ -157,6 +158,7 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                     WebDriverWait(driver, 360).until(
                         EC.presence_of_all_elements_located((By.CLASS_NAME, "wp-block-body"))
                     )
+                    time.sleep(3)
 
             if current_page >= last_page_number or current_page >= max_pages: 
                 break
