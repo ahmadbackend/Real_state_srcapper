@@ -82,9 +82,7 @@ def scrape_property_details(driver):
     return data
 # harvest specific number of pages or all pages(25)
 def harvest_apartments(start_url: str, max_pages: int=25):
-    """
-    Generator that streams apartment data page by page.
-    """
+    apartments = []  # List to store all apartment data
 
     driver = initialize_driver()
 
@@ -145,15 +143,9 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                     apartment = scrape_property_details(driver)
                     print("Scraped:", apartment.get("title"), flush=True)
 
-                    with open("data.txt", "a", encoding="utf-8") as f:
-                        f.write(apartment.get("description", "") + "\n")
-
-                    # ✅ yield as soon as one item is scraped
-                    yield json.dumps(apartment) + "\n"
-
+                    apartments.append(apartment)
                 except Exception as e:
-                    yield json.dumps({"error": f"failed on listing: {str(e)}"}) + "\n"
-                finally:
+                    apartments.append({"error": f"failed on listing {block + 1} of page {current_page}: {str(e)}"})                finally:
                     driver.back()
                     WebDriverWait(driver, 360).until(
                         EC.presence_of_all_elements_located((By.CLASS_NAME, "wp-block-body"))
@@ -176,9 +168,8 @@ def scrape(
 
     """
     Call:  GET /scrape?url=https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos?q=for-rent+flats-apartments+lagos&
-    Streams apartments one-by-one as JSON lines.
     """
-    return StreamingResponse(harvest_apartments(url, max_page), media_type="application/json")
+    return harvest_apartments(url, max_page)
 
 
 
