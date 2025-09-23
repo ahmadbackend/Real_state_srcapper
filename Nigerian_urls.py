@@ -85,7 +85,7 @@ def harvest_apartments(start_url: str, max_pages: int=25):
     apartments = []  # List to store all apartment data
 
     driver = initialize_driver()
-
+    max_tries = 3
     try:
         driver.get(start_url)
 
@@ -144,13 +144,19 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                     print("Scraped:", apartment.get("title"), flush=True)
 
                     apartments.append(apartment)
+                    max_tries = 3
                 except Exception as e:
-                    apartments.append({"error": f"failed on listing {block + 1} of page {current_page}: {str(e)}"})                finally:
-                    driver.back()
-                    WebDriverWait(driver, 360).until(
-                        EC.presence_of_all_elements_located((By.CLASS_NAME, "wp-block-body"))
-                    )
-                    time.sleep(3)
+                    # try three time to collect  house data then record the failure
+                    if max_tries > 0:
+                        block -= 1
+                        max_tries -=1
+                    else:
+                        apartments.append({"error": f"failed on listing {block + 1} of page {current_page}: {str(e)}"})                finally:
+                driver.back()
+                WebDriverWait(driver, 360).until(
+                    EC.presence_of_all_elements_located((By.CLASS_NAME, "wp-block-body"))
+                )
+                time.sleep(3)
 
             if current_page >= last_page_number or current_page >= max_pages: 
                 break
