@@ -88,15 +88,19 @@ def harvest_apartments(start_url: str):
         time.sleep(2)
 
         # detect last page if needed
-        # last_page_number = int(driver.find_element(By.XPATH, "//ul[@class='pagination']/li[last()-1]/a").text)
-        last_page_number = 1  # demo
+        last_page_number = int(driver.find_element(By.XPATH, "//ul[@role='navigation']/li[last()-1]/a").text)
+        print(last_page_number)
+        #last_page_number = 1  # demo
 
-        for page in range(1, last_page_number + 1):
+        while True:
+            current_page = 1
+            last_page_number = int(driver.find_element(By.XPATH, "//ul[@role='navigation']/li[last()-1]/a").text)
+
             # --- build page URL correctly ---
             if "?" in start_url:
-                page_url = f"{start_url}&page={page}"
+                page_url = f"{start_url}&page={current_page}"
             else:
-                page_url = f"{start_url}?page={page}"
+                page_url = f"{start_url}?page={current_page}"
 
             driver.get(page_url)
             time.sleep(2)
@@ -134,6 +138,11 @@ def harvest_apartments(start_url: str):
                     WebDriverWait(driver, 5).until(
                         EC.presence_of_all_elements_located((By.CLASS_NAME, "wp-block-body"))
                     )
+
+            if current_page >= last_page_number:
+                break
+            else:
+                current_page +=1
     finally:
         driver.quit()
 
