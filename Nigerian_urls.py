@@ -154,9 +154,10 @@ def harvest_apartments(start_url: str, max_pages: int=1):
                 print("house blocks found, page is ready!")
                 page_blocks = driver.find_elements(By.CLASS_NAME, "wp-block-body")
                 print(f"Found {len(page_blocks)} listings on page {current_page}", flush=True)
-                for block in range(len(page_blocks)):
+                for block in range(len(driver.find_elements(By.CLASS_NAME, "wp-block-body"))):
+
                     try:
-                        #page_blocks = driver.find_elements(By.CLASS_NAME, "wp-block-body")
+                        page_blocks = driver.find_elements(By.CLASS_NAME, "wp-block-body")
                         real_title = driver.find_elements(By.CLASS_NAME,"content-title")[block].text
                         real_currency = driver.find_elements(By.CLASS_NAME,"price")[block * 2].text # currency
                         real_price = driver.find_elements(By.CLASS_NAME,"price")[(block * 2) +1].text
@@ -176,6 +177,7 @@ def harvest_apartments(start_url: str, max_pages: int=1):
                         print("Scraped:", apartment, flush=True)
 
                         apartments.append(apartment)
+
                         max_house_tries = 3
                     except Exception as e:
                         print(e)
