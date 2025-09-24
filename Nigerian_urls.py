@@ -178,10 +178,10 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                         )
 
                         apartment = scrape_property_details(driver)
-                        print("Scraped:", apartment.get("title"), flush=True)
+                        print("Scraped:", apartment.get("current_url"), flush=True)
 
                         apartments.append(apartment)
-                        max_tries = 3
+                        max_house_tries = 3
                     except Exception as e:
                         # try three time to collect  house data then record the failure
                         if max_house_tries > 0:
@@ -192,7 +192,6 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                                 {"error": f"failed on listing {block + 1} of page {current_page}: {str(e)}"})
                     finally:
                         driver.back()
-                        driver.back()
                         WebDriverWait(driver, 360).until(
                             EC.presence_of_all_elements_located((By.CLASS_NAME, "wp-block-body"))
                         )
@@ -200,7 +199,6 @@ def harvest_apartments(start_url: str, max_pages: int=25):
 
                 if current_page >= last_page_number or current_page >= max_pages:
                     driver.quit()
-                    os.remove(pluginfile)  # cleanup
 
                     break
                 else:
@@ -220,7 +218,7 @@ def harvest_apartments(start_url: str, max_pages: int=25):
         except Exception as e:
             print(f"failed to load the url{start_url}: {e}")
 
-    return apartments  # Don't forget to return the results!
+    return apartments  # return the results!
 
 
 @app.get("/scrape")
