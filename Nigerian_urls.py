@@ -23,7 +23,8 @@ proxy_user = config("proxy_user")
 proxy_pass = config("proxy_pass")
 proxy_string = f"{proxy_host}:{proxy_port}"  #cc-us-city-new_york-sessid-test123.bc.pr.oxylabs.io:7777# Add proxy
 # Add proxy authentication via extension
-manifest_json = """
+"""
+#manifest_json = """
 {
   "version": "1.0.0",
   "manifest_version": 2,
@@ -32,8 +33,10 @@ manifest_json = """
   "background": {"scripts": ["background.js"]}
 
 }
+#"""
 """
-background_js = f"""
+"""
+#background_js = f"""
 chrome.webRequest.onAuthRequired.addListener(
   function handler(details) {{
     return {{authCredentials: {{username: "{proxy_user}", password: "{proxy_pass}"}}}};
@@ -41,11 +44,12 @@ chrome.webRequest.onAuthRequired.addListener(
   {{urls: ["<all_urls>"]}},
   ['blocking']
 );
+#"""
 """
-pluginfile = 'proxy_auth_plugin.zip'
-with zipfile.ZipFile(pluginfile, 'w') as zp:
-    zp.writestr("manifest.json", manifest_json)
-    zp.writestr("background.js", background_js)
+#pluginfile = 'proxy_auth_plugin.zip'
+#with zipfile.ZipFile(pluginfile, 'w') as zp:
+ #   zp.writestr("manifest.json", manifest_json)
+ #  zp.writestr("background.js", background_js)
 
 
 app = FastAPI()
@@ -65,6 +69,9 @@ def initialize_driver():
     chrome_options.add_experimental_option('prefs', {'webrtc.ip_handling_policy': 'disable_non_proxied_udp'})
     chrome_options.add_experimental_option('prefs', {'webrtc.multiple_routes_enabled': False})
     chrome_options.add_argument(f'--proxy-server=https://{proxy_string}')
+    chrome_options.add_argument('--disable-crash-reporter')
+    chrome_options.add_argument('--no-crash-upload')
+
     #chrome_options.add_extension(pluginfile)
 
     driver = webdriver.Chrome( options=chrome_options)
@@ -204,6 +211,7 @@ def harvest_apartments(start_url: str, max_pages: int=25):
 
                 if current_page >= last_page_number or current_page >= max_pages:
                     driver.quit()
+                    driver.close()
 
                     break
                 else:
