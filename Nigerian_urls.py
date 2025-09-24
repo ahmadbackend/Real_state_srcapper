@@ -1,6 +1,9 @@
 import json
 import zipfile, os
+from fake_useragent import UserAgent
+from selenium_stealth import stealth
 
+ua = UserAgent()
 from decouple import  config
 from selenium import  common,webdriver
 from selenium.webdriver.common.by import By
@@ -52,10 +55,11 @@ app = FastAPI()
 def initialize_driver():
     chrome_options = webdriver.ChromeOptions()
     #chrome_options.add_argument('--headless=new')
+    chrome_options.add_argument('--lang=en-US,en;q=0.9')
 
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
-    #chrome_options.add_argument(f'user-agent={ua.random}')
+    chrome_options.add_argument(f'user-agent={ua.random}')
     # Disable WebRTC
     chrome_options.add_argument('--disable-webrtc')
     chrome_options.add_experimental_option('prefs', {'webrtc.ip_handling_policy': 'disable_non_proxied_udp'})
@@ -64,6 +68,13 @@ def initialize_driver():
     #chrome_options.add_extension(pluginfile)
 
     driver = webdriver.Chrome( options=chrome_options)
+    stealth(driver,
+            languages=["en-US", "en"],
+            vendor="Google Inc.",
+            platform="Win32",
+            webgl_vendor="Intel Inc.",
+            renderer="Intel Iris OpenGL",
+            fix_hairline=True)
     return driver
 
 def scrape_property_details(driver):
