@@ -164,7 +164,7 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                         real_title = driver.find_elements(By.CLASS_NAME,"content-title")[block].text
                         real_currency = driver.find_elements(By.CLASS_NAME,"price")[block * 2].text # currency
                         real_price = driver.find_elements(By.CLASS_NAME,"price")[(block * 2) +1].text
-                        print(f"real_title:{real_title}, real_currency:{real_currency}")
+                        print(f"real_title:{real_title}, real_currency:{real_currency}, {real_price}")
                         # locate the link inside the block
                         link_elem = WebDriverWait(page_blocks[block], 360).until(
                             EC.presence_of_element_located((By.CSS_SELECTOR, "a"))
@@ -183,19 +183,19 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                         apartments.append(apartment)
                         max_house_tries = 3
                     except Exception as e:
+                        print(f"real_title:{real_title}, real_currency:{real_currency}, {real_price}")
+                        print(e)
                         # try three time to collect  house data then record the failure
                         if max_house_tries > 0:
                             block -= 1
                             max_house_tries -= 1
                         else:
-                            apartments.append(
-                                {"error": f"failed on listing {block + 1} of page {current_page}: {str(e)}"})
+                            apartments.append({"error": f"failed on listing {block + 1} of page {current_page}: {str(e)}"})
                     finally:
                         driver.back()
                         WebDriverWait(driver, 360).until(
                             EC.presence_of_all_elements_located((By.CLASS_NAME, "wp-block-body"))
                         )
-                        time.sleep(3)
 
                 if current_page >= last_page_number or current_page >= max_pages:
                     driver.quit()
@@ -213,10 +213,9 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                     #current_page -= 1 if 
                     max_page_tries -= 1
                 else:
-                    apartments.append(
-                        {"error": f"failed to harvest data ofpage number {current_page } : {str(e)}"})
-                print("Element not found within 360 seconds, proceeding anyway or handling error.")
-
+                    apartments.append({"error": f"failed to harvest data of page number {current_page } : {str(e)}"})
+                    print("Element not found within 360 seconds, proceeding anyway or handling error.", e)
+                    current_page+=1
 
         except Exception as e:
             print(f"failed to load the url{start_url}: {e}")
