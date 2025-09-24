@@ -178,7 +178,7 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                         )
 
                         apartment = scrape_property_details(driver)
-                        print("Scraped:", apartment.get("current_url"), flush=True)
+                        print("Scraped:", apartment, flush=True)
 
                         apartments.append(apartment)
                         max_house_tries = 3
