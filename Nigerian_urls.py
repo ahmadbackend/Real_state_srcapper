@@ -134,7 +134,22 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                 EC.presence_of_element_located((By.XPATH, "//ul[@role='navigation']/li[last()-1]/a"))
             )
             print("Element found, page is ready!")
-            last_page_number = int(driver.find_element(By.XPATH, "//ul[@role='navigation']/li[last()-1]/a").text)
+            import re
+
+            # get all page numbers as integers
+            page_elems = driver.find_elements(By.XPATH, "//ul[@role='navigation']/li/a")
+            page_numbers = []
+            for elem in page_elems:
+                text = elem.text.strip()
+                if text.isdigit():            # ✅ only keep pure numbers
+                    page_numbers.append(int(text))
+
+            if page_numbers:
+                last_page_number = max(page_numbers)  # ✅ safe max
+            else:
+                last_page_number = 1                  # fallback if no pagination
+            
+
             print(last_page_number)
             try:
                 WebDriverWait(driver, 360).until(
@@ -149,6 +164,7 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                         real_title = driver.find_elements(By.CLASS_NAME,"content-title")[block].text
                         real_currency = driver.find_elements(By.CLASS_NAME,"price")[block * 2].text # currency
                         real_price = driver.find_elements(By.CLASS_NAME,"price")[(block * 2) +1].text
+                        print(f"real_title:{real_title}, real_currency:{real_currency}")
                         # locate the link inside the block
                         link_elem = WebDriverWait(page_blocks[block], 360).until(
                             EC.presence_of_element_located((By.CSS_SELECTOR, "a"))
