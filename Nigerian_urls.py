@@ -37,7 +37,7 @@ def initialize_driver():
     chrome_options.add_argument('--disable-webrtc')
     chrome_options.add_experimental_option('prefs', {'webrtc.ip_handling_policy': 'disable_non_proxied_udp'})
     chrome_options.add_experimental_option('prefs', {'webrtc.multiple_routes_enabled': False})
-    #chrome_options.add_argument(f'--proxy-server=https://{proxy_string}')
+    chrome_options.add_argument(f'--proxy-server=https://{proxy_string}')
     chrome_options.add_argument('--disable-crash-reporter')
     chrome_options.add_argument('--no-crash-upload')
     chrome_options.add_argument("--blink-settings=imagesEnabled=false")
