@@ -229,7 +229,7 @@ def harvest_apartments(start_url: str, max_pages: int=25):
 @app.get("/scrape")
 def scrape(
     url: str = Query(..., description="Listing URL to scrape"),
-    max_page: int = Query(2, description="Maximum number of pages to scrape")  #  default = 25
+    max_page: int = Query(1, description="Maximum number of pages to scrape")  #  default = 25
 ):
 
     """
