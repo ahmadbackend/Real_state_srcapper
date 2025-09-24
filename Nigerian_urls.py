@@ -121,8 +121,10 @@ def scrape_property_details(driver,real_title, real_currency, real_price):
                         details[key] = value if value else None
                     current_url = driver.current_url
                     details["current_url"] = current_url # getting house url directly
+                    detailts["real_title"] = real_title
+                    details["real_currency"] = real_currency
+                    details["real_price"] = real_price
         data["details"] = details
-        data["real_title", "real_currency", "real_price"] = real_title, real_currency, real_price
     except NoSuchElementException:
         data["details"] = {}
 
