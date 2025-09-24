@@ -1,20 +1,16 @@
-import json
-import zipfile, os
 from fake_useragent import UserAgent
 from selenium_stealth import stealth
 
 ua = UserAgent()
 from decouple import  config
-from selenium import  common,webdriver
+from selenium import  webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
-import time
+
 from selenium.common.exceptions import NoSuchElementException
 #fastapi for converting it to api endpoint
 from fastapi import FastAPI, Query
-from fastapi.responses import StreamingResponse
 # setting proxy config
 
 proxy_host = config("PROXY_HOST")
@@ -100,7 +96,7 @@ def scrape_property_details(driver,real_title, real_currency, real_price):
                         details[key] = value if value else None
                     current_url = driver.current_url
                     details["current_url"] = current_url # getting house url directly
-                    detailts["real_title"] = real_title
+                    details["real_title"] = real_title
                     details["real_currency"] = real_currency
                     details["real_price"] = real_price
         data["details"] = details
@@ -109,7 +105,7 @@ def scrape_property_details(driver,real_title, real_currency, real_price):
 
     return data
 # harvest specific number of pages or all pages(25)
-def harvest_apartments(start_url: str, max_pages: int=25):
+def harvest_apartments(start_url: str, max_pages: int=1):
     apartments = []  # List to store all apartment data
 
     max_page_tries = 3
@@ -160,7 +156,7 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                 print(f"Found {len(page_blocks)} listings on page {current_page}", flush=True)
                 for block in range(len(page_blocks)):
                     try:
-                        page_blocks = driver.find_elements(By.CLASS_NAME, "wp-block-body")
+                        #page_blocks = driver.find_elements(By.CLASS_NAME, "wp-block-body")
                         real_title = driver.find_elements(By.CLASS_NAME,"content-title")[block].text
                         real_currency = driver.find_elements(By.CLASS_NAME,"price")[block * 2].text # currency
                         real_price = driver.find_elements(By.CLASS_NAME,"price")[(block * 2) +1].text
@@ -169,7 +165,6 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                         link_elem = WebDriverWait(page_blocks[block], 360).until(
                             EC.presence_of_element_located((By.CSS_SELECTOR, "a"))
                         )
-                        link_href = link_elem.get_attribute("href")
 
                         # open property in same tab
                         driver.execute_script("arguments[0].click();", link_elem)
@@ -183,7 +178,6 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                         apartments.append(apartment)
                         max_house_tries = 3
                     except Exception as e:
-                        print(f"real_title:{real_title}, real_currency:{real_currency}, {real_price}")
                         print(e)
                         # try three time to collect  house data then record the failure
                         if max_house_tries > 0:
@@ -199,8 +193,6 @@ def harvest_apartments(start_url: str, max_pages: int=25):
 
                 if current_page >= last_page_number or current_page >= max_pages:
                     driver.quit()
-                    driver.close()
-
                     break
                 else:
                     current_page += 1
