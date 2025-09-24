@@ -207,8 +207,10 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                     max_page_tries = 3 # reset after success harvesting
             # record failed pages after 3 tries
             except Exception as e:
+                print("the error is", e)
                 if max_page_tries > 0:
-                    current_page -= 1
+                    
+                    #current_page -= 1 if 
                     max_page_tries -= 1
                 else:
                     apartments.append(
