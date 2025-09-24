@@ -14,12 +14,11 @@ from fastapi import FastAPI, Query
 from fastapi.responses import StreamingResponse
 # setting proxy config
 
-proxy_host = config("proxy_host")
-proxy_port = config("proxy_port")
-
+proxy_host = config("PROXY_HOST")
+proxy_port = config("PROXY_PORT")
 proxy_user = config("proxy_user")
 proxy_pass = config("proxy_pass")
-
+proxy_string = f"{proxy_host}:{proxy_port}"  #cc-us-city-new_york-sessid-test123.bc.pr.oxylabs.io:7777# Add proxy
 # Add proxy authentication via extension
 manifest_json = """
 {
@@ -61,8 +60,8 @@ def initialize_driver():
     chrome_options.add_argument('--disable-webrtc')
     chrome_options.add_experimental_option('prefs', {'webrtc.ip_handling_policy': 'disable_non_proxied_udp'})
     chrome_options.add_experimental_option('prefs', {'webrtc.multiple_routes_enabled': False})
-    chrome_options.add_argument(f"--proxy-server=http://{proxy_host}:{proxy_port}")
-    chrome_options.add_extension(pluginfile)
+    chrome_options.add_argument(f'--proxy-server=https://{proxy_string}')
+    #chrome_options.add_extension(pluginfile)
 
     driver = webdriver.Chrome( options=chrome_options)
     return driver
@@ -129,7 +128,7 @@ def harvest_apartments(start_url: str, max_pages: int=25):
     current_page = 1
 
     while True:
-        driver = initialize_driver()
+        driver = initialize_driver() # initialize new proxxy for each page
         try:
             WebDriverWait(driver, 360).until(
                 EC.presence_of_element_located((By.XPATH, "//ul[@role='navigation']/li[last()-1]/a"))
@@ -214,7 +213,7 @@ def harvest_apartments(start_url: str, max_pages: int=25):
 @app.get("/scrape")
 def scrape(
     url: str = Query(..., description="Listing URL to scrape"),
-    max_page: int = Query(25, description="Maximum number of pages to scrape")  #  default = 25
+    max_page: int = Query(1, description="Maximum number of pages to scrape")  #  default = 25
 ):
 
     """
