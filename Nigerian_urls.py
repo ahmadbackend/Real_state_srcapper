@@ -140,18 +140,20 @@ def harvest_apartments(start_url: str, max_pages: int=25):
 
     while True:
         driver = initialize_driver() # initialize new proxxy for each page
+
         try:
+
+            if "?" in start_url:
+                page_url = f"{start_url}&page={current_page}"
+            else:
+                page_url = f"{start_url}?page={current_page}"
+            driver.get(page_url)
             WebDriverWait(driver, 360).until(
                 EC.presence_of_element_located((By.XPATH, "//ul[@role='navigation']/li[last()-1]/a"))
             )
             print("Element found, page is ready!")
             last_page_number = int(driver.find_element(By.XPATH, "//ul[@role='navigation']/li[last()-1]/a").text)
             print(last_page_number)
-            if "?" in start_url:
-                page_url = f"{start_url}&page={current_page}"
-            else:
-                page_url = f"{start_url}?page={current_page}"
-            driver.get(page_url)
             try:
                 WebDriverWait(driver, 360).until(
                     EC.presence_of_element_located((By.CLASS_NAME, "wp-block-body"))
