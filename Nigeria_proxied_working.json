@@ -1,0 +1,759 @@
+{
+  "name": "My workflow 3",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "344c65cc-d035-4164-b37f-aebac09f137c",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1oTWjtmMNCtBjlKWKmi2XYJxXyC3BlwlOsdrsqTiNw4Y",
+          "mode": "list",
+          "cachedResultName": "Scraper Config",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oTWjtmMNCtBjlKWKmi2XYJxXyC3BlwlOsdrsqTiNw4Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 488427729,
+          "mode": "list",
+          "cachedResultName": "Nigeria - NigeriaPropertyCenter",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oTWjtmMNCtBjlKWKmi2XYJxXyC3BlwlOsdrsqTiNw4Y/edit#gid=488427729"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "44bf2d01-5335-4fb9-a8cd-634772900b5f",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "607b3ETscFEo9K3Z",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "6291c6ac-9048-495b-952e-8a09b629da3f",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "url": "https://real-state-srcapper.onrender.com/scrape",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ $json.url }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 1000000000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        624,
+        96
+      ],
+      "id": "c8c8a5df-8729-4824-a585-de733e4a9167",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1Ayyee7X0c5akOhhIubHM4SJ8mSx7MtXo8D2MZmrtNQc",
+          "mode": "list",
+          "cachedResultName": "Scraped Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ayyee7X0c5akOhhIubHM4SJ8mSx7MtXo8D2MZmrtNQc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1668264261,
+          "mode": "list",
+          "cachedResultName": "Nigeria",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ayyee7X0c5akOhhIubHM4SJ8mSx7MtXo8D2MZmrtNQc/edit#gid=1668264261"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "site_name": "={{ $json.details.current_url }}",
+            "document_name": "={{ $json.details.current_url }}",
+            "price": "={{ $json.details['Service Charge'] }}",
+            "retrieved_at": "={{ $json.details['Last Updated'] }}",
+            "bedrooms": "={{ $json.details.Bedrooms }}",
+            "bathrooms": "={{ $json.details.Bathrooms }}",
+            "details": "={{ $json.description }}",
+            "description": "={{ $json.details['Property Ref'] }}",
+            "title": "=",
+            "area": "={{ $json.details['Covered Area'] }}"
+          },
+          "matchingColumns": [
+            "price"
+          ],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "price",
+              "displayName": "price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "currency",
+              "displayName": "currency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "area",
+              "displayName": "area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "unit",
+              "displayName": "unit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "location",
+              "displayName": "location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "image",
+              "displayName": "image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "link",
+              "displayName": "link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "retrieved_at",
+              "displayName": "retrieved_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "price_per_sqm",
+              "displayName": "price_per_sqm",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "listing_type",
+              "displayName": "listing_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "images",
+              "displayName": "images",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "images_joined",
+              "displayName": "images_joined",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "asset_type",
+              "displayName": "asset_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "document_name",
+              "displayName": "document_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "site_name",
+              "displayName": "site_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "bedrooms",
+              "displayName": "bedrooms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "bathrooms",
+              "displayName": "bathrooms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "details",
+              "displayName": "details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        832,
+        96
+      ],
+      "id": "5f8cdb10-76a4-4671-8a28-6b465b259b35",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "607b3ETscFEo9K3Z",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "HTTP Request1": [
+      {
+        "json": {
+          "description": "Modern finished fully furnished 3 bedroom apartment with BQ on 6th floor 2 units available in the same area Serviced Large swimming pool Gym 24 hrs security High speed internet Dstv Rent: #42,500,000.00 Service Charge: #12,500,000.00 Inclusive of Deposit for Power WhatsApp: 08032529401",
+          "details": {
+            "Property Ref": "2193568",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos/victoria-island/2193568-2-units-exquisite-3-bedroom-apartment-with-bq",
+            "Last Updated": "18 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Flat / Apartment",
+            "Bedrooms": "3",
+            "Bathrooms": "3",
+            "Toilets": "4",
+            "Parking Spaces": "2",
+            "Furnishing": "Furnished",
+            "Servicing": "Serviced",
+            "Service Charge": "₦12,000,000 per annum"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "*FOR RENT 3 BEDROOM APARTMENT* Newly built 3 bedroom flat at Buena Vista Estate, Orchid Hotel, Lafiaji, Lagos. Rent: ₦5.5m/annum Service charge: ₦600k/annum Agency : 10% Legal : 10% Contact",
+          "details": {
+            "Property Ref": "3111931",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos/lekki/3111931-newly-built-3-bedroom-apartment-flat",
+            "Last Updated": "24 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Flat / Apartment",
+            "Bedrooms": "3",
+            "Bathrooms": "3",
+            "Toilets": "4",
+            "Servicing": "Serviced",
+            "Service Charge": "₦600,000 per annum"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "Spotless Master Bedroom + Parlor Space is a available for rent at Arthur Court ,Royal Pine Estate ,Gate 1, Orchid Road,Lekki (Video Available) *NOTE :TO SHARE FITTED KITCHEN ONLY* FEATURES - Spacious master bedroom with private parlor - Double balconies on both wings - Neat and well-maintained unit Rent: ₦4M Service Charge -₦400K Agency -- ₦400K Legal -- ₦400K Caution - ₦400K Total package-₦5,600,000 *₦10K Consultation inspection fee applies* sdra nst 24/09/25",
+          "details": {
+            "Property Ref": "3111918",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/mini-flats/lagos/lekki/3111918-spotless-master-bedroom-parlor-space-video-available",
+            "Last Updated": "24 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Mini Flat (Room and Parlour)",
+            "Bedrooms": "1",
+            "Bathrooms": "1",
+            "Toilets": "2",
+            "Parking Spaces": "1",
+            "Servicing": "Serviced",
+            "Service Charge": "₦400,000 per annum"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "For rent: 3-bedroom ground floor in a block of 6 units at Ikate. Rent ₦7.5m Service charge ₦500k for utilities Agency, legal and caution 10% each Personal prepaid meter.",
+          "details": {
+            "Property Ref": "3111934",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos/lekki/ikate/3111934-3-bedroom-apartment",
+            "Last Updated": "24 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Flat / Apartment",
+            "Bedrooms": "3",
+            "Bathrooms": "3",
+            "Toilets": "4",
+            "Parking Spaces": "6",
+            "Servicing": "Serviced",
+            "Service Charge": "₦500,000"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "LARGE 2 BEDROOM apartments in a secured estate in igboefon facing the Lekki Epe expressway... 3m per annum.. slightly negotiable.. ALC 10% each SC 45k monthly.... Pls call now: 07032628482",
+          "details": {
+            "Property Ref": "3112059",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos/lekki/igbo-efon/3112059-large-2-bedroom-apartment",
+            "Last Updated": "24 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Flat / Apartment",
+            "Bedrooms": "2",
+            "Toilets": "11",
+            "Parking Spaces": "1",
+            "Servicing": "Serviced",
+            "Service Charge": "₦45,000 per month"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "TO LET Details:2 bedroom flat fully furnished Location: off freedom Way Lekki phase 1 Rent: N13Millon Service charge: N2million Agency:10% Caution:10% Legacy:10% Contact:+234 803 680 3104",
+          "details": {
+            "Property Ref": "3112055",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos/lekki/lekki-phase-1/3112055-2bedroom-flat-fully-furnished",
+            "Last Updated": "24 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Flat / Apartment",
+            "Bedrooms": "2",
+            "Bathrooms": "2",
+            "Toilets": "3",
+            "Furnishing": "Furnished",
+            "Servicing": "Serviced",
+            "Service Charge": "₦2,000,000 per annum"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "*TO LET IN LEKKI PHASE 1* *DESCRIPTION:* LUXURY 3 BEDROOM FLATS APARTMENTS WITH A ROOM BQ TO LET *LOCATION:* OFF ESTHER ADELEKE STREET, LEKKI PHASE 1, LAGOS *RENT - ₦18M (net) PER ANNUM FOR GROUND FLOOR* *1st FLOOR - ₦22M PER ANNUM* *S/CHARGE - ₦4.5M* *DIESEL DEPOSIT:₦3M* *CAUTION PER: 10%* *LEGAL FEE: 10%* *AGENCY FEE: 10%* *FEATURES:* (1) Fully fitted kitchen (2) Spacious living room (3) A Room BQ (4) Swimming Pool (4) Modern Gym (5) Secured Serene environment within gated Estate (6) Band B Ekedc dedicated meter (7) Dedicated diesel check meter (8) 24/7 Security (9) Dedicated tranformer (10) Ample parking space Etc *PLEASE COME WITH YOUR DIRECT CLIENTS AS I'M DEALING WITH THE SEMI DIRECT AGENT Sunnyca",
+          "details": {
+            "Property Ref": "3112020",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos/lekki/lekki-phase-1/3112020-luxury-3-bedroom-apartment",
+            "Last Updated": "24 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Flat / Apartment",
+            "Bedrooms": "3",
+            "Bathrooms": "3",
+            "Toilets": "4",
+            "Servicing": "Serviced",
+            "Service Charge": "₦4,500,000 per annum"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "*SEMI DIRECT PROPERTY* 3 bedroom for rent Location lekki phase1 Price: 15 million without AC, 17million with AC slightly negotiable Service charge: not determined Caution: 500k Agency : 10 of the rent Legal: 10 of the rent",
+          "details": {
+            "Property Ref": "3111982",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos/lekki/lekki-phase-1/3111982-luxury-3bedroom-apartment",
+            "Last Updated": "24 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Flat / Apartment",
+            "Bedrooms": "3",
+            "Bathrooms": "3",
+            "Toilets": "4",
+            "Servicing": "Serviced"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "NEWLY DEVELOPED SUPER LUXURY 3-BEDROOM APARTMENT AT LEKKI PHASE 1 with an elevator and swimming pool. Location: Lekki phase 1. Rent: ₦30m Agency fee: 10% Legal fee: 10% Refundable caution fee: 10% Service charge: 100k per month",
+          "details": {
+            "Property Ref": "3106605",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos/lekki/lekki-phase-1/3106605-super-luxury-3-bedroom-apartment-with-an-elevator-and-a-swimming-pool",
+            "Last Updated": "24 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Flat / Apartment",
+            "Bedrooms": "3",
+            "Bathrooms": "3",
+            "Toilets": "3"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "Tastefully furnished 2 bedroom apartment Features; All rooms en-suite Large living room Wine cellar Fitted with AC's, double door refrigerator,washing room Maximum security (soldiers quarters) Pool Gym 24hr power Clean water Ample parking space 2 BQ On site facility management",
+          "details": {
+            "Property Ref": "2891193",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos/ikoyi/2891193-tastefully-furnished-2-bedroom-apartment",
+            "Last Updated": "24 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Flat / Apartment",
+            "Bedrooms": "2",
+            "Bathrooms": "2",
+            "Toilets": "3",
+            "Parking Spaces": "2",
+            "Furnishing": "Furnished"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "FOR RENT!!! NICELY BUILT 3 BEDROOM APARTMENT Location- Ikoyi,Lagos Rent- N8million Agency- 10% Legal - 10% Caution - 10% Service Charge-N100k Features: * Spacious Living Area * Serene Environment * Gated House * ⁠24 Hours Security * Ample Parking Space",
+          "details": {
+            "Property Ref": "3111990",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos/ikoyi/3111990-3-bedroom-apartment",
+            "Last Updated": "24 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Flat / Apartment",
+            "Bedrooms": "3",
+            "Bathrooms": "3",
+            "Toilets": "4",
+            "Servicing": "Serviced",
+            "Service Charge": "₦100,000 per annum"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "To let Brand new fully furnished 3 bedroom apartment with excellent facilities Rent - 25m per annum Location : ikoyi, lekki Other charges Agency: 10% Caution: 1million (refundable) Legal : 5% Service charge: 1. 8m Features; * spacious * treated water * microwave/ oven * heat extractor * speakers * ⁠inverter * spacious dining table * good road network * ⁠24hrs security * ⁠fully fitted kitchen",
+          "details": {
+            "Property Ref": "2791857",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos/ikoyi/2791857-fully-furnished-3-bedroom-apartment-with-excellent-facilities",
+            "Last Updated": "08 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Flat / Apartment",
+            "Bedrooms": "3",
+            "Bathrooms": "4",
+            "Toilets": "4",
+            "Parking Spaces": "3",
+            "Furnishing": "Furnished",
+            "Total Area": "450 sqm",
+            "Covered Area": "540 sqm"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "3 bedroom penthouse overseeing the Atlantic. banana island yearly rental 80M Agency:10% Legal:10% SC:5M Caution:5M Features: Private elevator Gym Pool 24hr power Highly secure Serene environment Smart TV Dstv Ultra Fast Wi-Fi",
+          "details": {
+            "Property Ref": "2791403",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos/ikoyi/banana-island/2791403-tastefully-furnished-waterfront-apartment",
+            "Last Updated": "18 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Flat / Apartment",
+            "Bedrooms": "3",
+            "Bathrooms": "3",
+            "Toilets": "4",
+            "Parking Spaces": "2",
+            "Furnishing": "Furnished"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "3 bedroom penthouse banana island yearly rental 80M Agency:10% Legal:10% SC:5M Caution:5M Features: Private elevator Gym Pool 24hr power Highly secure Serene environment Smart TV Dstv Ultra Fast Wi-Fi",
+          "details": {
+            "Property Ref": "2791439",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos/ikoyi/banana-island/2791439-tastefully-furnished-3-bedroom-penthouse-apartment",
+            "Last Updated": "22 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Flat / Apartment",
+            "Bedrooms": "3",
+            "Bathrooms": "3",
+            "Toilets": "4",
+            "Parking Spaces": "2",
+            "Furnishing": "Furnished"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "Just Out To let Exclusive fully Furnished 3 bedroom flat with a boys quarter To let In Ikoyi Location: Banana Island Road, Ikoyi Rent: 35m Service charge: 6m Agency: 10% Legal: 10% Caution: 1.5m Shortlet/Airbnb Allowed Call for inspections and easy closing",
+          "details": {
+            "Property Ref": "3045930",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos/ikoyi/banana-island/3045930-exclusive-furnished-3-bedroom",
+            "Last Updated": "24 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Flat / Apartment",
+            "Bedrooms": "3",
+            "Bathrooms": "3",
+            "Toilets": "4",
+            "Parking Spaces": "2",
+            "Furnishing": "Furnished",
+            "Servicing": "Serviced"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "A very decent 3 bedroom apartment for rent in banana in the mixed zone. Attached is a swimming pool and a bq Rent: ₦25m Service Charge: ₦5m (diesel inclusive) Agency: 10% Legal: 10%",
+          "details": {
+            "Property Ref": "3111922",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos/ikoyi/banana-island/3111922-3-bedroom-apartment",
+            "Last Updated": "24 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Flat / Apartment",
+            "Bedrooms": "3",
+            "Servicing": "Serviced",
+            "Service Charge": "₦5,000,000 per annum"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "Available for rent. 3 units of 3 bedroom flat Rent: 25M service charge: to be determined",
+          "details": {
+            "Property Ref": "3039764",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos/ikeja/gra/3039764-3-units-of-3-bedrooms-apartment",
+            "Last Updated": "27 Aug 2025",
+            "Market Status": "Available",
+            "Type": "Flat / Apartment",
+            "Bedrooms": "3"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "*LUXURY STANDARD SPACIOUS SHARED APARTMENT with AC AVAILABLE TO LET UPSTAIRS* LOCATION: in a secured Est' mod Badore Ajah Lekki Lagos Nigeria. *NB:* Close proximity to the road! Rent: 1m Agency: Legal: RCD: S/C: self serviced *Total: N1,450,000* *Highlights:* Clean Spacious Water heater Fancy bathrooms Wardrobe Walkable to express Call to Access Interlocked road Don't miss it!",
+          "details": {
+            "Property Ref": "3111988",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/self-contained/lagos/ajah/badore/3111988-luxury-standard-spacious-shared-apartment-with-ac-upstairs",
+            "Last Updated": "24 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Self Contain (Single Rooms)",
+            "Bathrooms": "1",
+            "Toilets": "1",
+            "Total Area": "25 sqm"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "Clean 3 bedroom flat in a well secured environment with steady light and clean water e.t.c. Rent: ₦1.5m",
+          "details": {
+            "Property Ref": "3111912",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos/lekki-ibeju/eputu/3111912-3-bedroom-flat",
+            "Last Updated": "24 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Flat / Apartment",
+            "Bedrooms": "3",
+            "Bathrooms": "3",
+            "Toilets": "4"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "Direct letting . Full furnished Serviced Masters Room in A Shared Duplex [ Ground Floor ] in a Call to access Estate, Gbagada! No Code No entry. Treakable to UPS, Nissan, Newcastle, Anthony Underbridge Via Oworoshonki- Gbagada Expressway ‎‎Features: ‎‎Ensuite ‎‎Fully Furnished: Full access to comfortable bed, TV, air conditioning, refrigerator, water heater, and other kitchen amenities ‎Wifi [ tbd ] ‎24-Hours Electricity Fully Secured ‎CCTV cameras and round-the-clock Uniform Harmed security. ‎‎ Going for ₦1.5M yearly rent no caution no service charge Dm for inspection anytime of the day 🥰. ..",
+          "details": {
+            "Property Ref": "3111920",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/self-contained/lagos/gbagada/3111920-a-room-self-contain-in-a-duplex",
+            "Last Updated": "24 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Self Contain (Single Rooms)",
+            "Bathrooms": "1",
+            "Toilets": "1"
+          }
+        }
+      },
+      {
+        "json": {
+          "description": "NOW AVAILABLE Ocean View 3 bedroom apartment with Bq for rent in Eko Pearl Tower A for rent. PRICE: NGN 55,000,000 Service charge - N5M Caution - 1M Agency - 10% Legal - 5% Unfurnished - 55M Furnished - 60M STATUS: Can be rented Furnished/Unfurnished INSPECTIONS: Inspections can be scheduled immediately. *Kindly note that fees and other charges apply.*",
+          "details": {
+            "Property Ref": "3111989",
+            "current_url": "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos/eko-atlantic-city/3111989-ocean-view-3-bedroom-apartment-with-bq",
+            "Last Updated": "24 Sep 2025",
+            "Market Status": "Available",
+            "Type": "Flat / Apartment",
+            "Bedrooms": "3",
+            "Bathrooms": "3",
+            "Toilets": "4",
+            "Parking Spaces": "2",
+            "Servicing": "Serviced",
+            "Service Charge": "₦5,000,000"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0743ce37-f437-4271-9e5e-e37440b99922",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e6081360d70e8b43b2c4cfa893ff15f9ad70c7b6555bb205f9abad795d326d7d"
+  },
+  "id": "hX9rGfMMMOn5byXU",
+  "tags": []
+}

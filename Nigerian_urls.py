@@ -77,7 +77,7 @@ def initialize_driver():
             fix_hairline=True)
     return driver
 
-def scrape_property_details(driver):
+def scrape_property_details(driver,real_title, real_currency, real_price):
     details_tab = driver.find_element(By.CSS_SELECTOR, 'ul.tabs li a[href="#tab-1"]')
     """
     WebDriverWait(driver, 360).until(
@@ -122,6 +122,7 @@ def scrape_property_details(driver):
                     current_url = driver.current_url
                     details["current_url"] = current_url # getting house url directly
         data["details"] = details
+        data["real_title", "real_currency", "real_price"] = real_title, real_currency, real_price
     except NoSuchElementException:
         data["details"] = {}
 
@@ -164,7 +165,9 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                 for block in range(len(page_blocks)):
                     try:
                         page_blocks = driver.find_elements(By.CLASS_NAME, "wp-block-body")
-
+                        real_title = driver.find_elements(By.CLASS_NAME,"content-title")[block].text
+                        real_currency = driver.find_elements(By.CLASS_NAME,"price")[block * 2].text # currency
+                        real_price = driver.find_elements(By.CLASS_NAME,"price")[(block * 2) +1].text
                         # locate the link inside the block
                         link_elem = WebDriverWait(page_blocks[block], 360).until(
                             EC.presence_of_element_located((By.CSS_SELECTOR, "a"))
@@ -177,7 +180,7 @@ def harvest_apartments(start_url: str, max_pages: int=25):
                             EC.presence_of_element_located((By.CSS_SELECTOR, ".property-details"))
                         )
 
-                        apartment = scrape_property_details(driver)
+                        apartment = scrape_property_details(driver, real_title, real_currency, real_price)
                         print("Scraped:", apartment, flush=True)
 
                         apartments.append(apartment)
