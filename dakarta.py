@@ -22,7 +22,6 @@ proxy_string = f"{proxy_host}:{proxy_port}"  #cc-us-city-new_york-sessid-test123
 #method to handle initial slide pop up
 
 
-house_urls=[]
 data = []
 def initialize_driver():
 
@@ -102,6 +101,7 @@ def single_page_data_collection(url):
     single_page_data = []
     driver = initialize_driver()
     wait = WebDriverWait(driver, 50)  # wait up to 50 seconds
+    house_urls = []
 
     driver.get(url)
     time.sleep(10)
@@ -112,6 +112,7 @@ def single_page_data_collection(url):
 
         details = {}
         try:
+
             url = house.find_element(By.CSS_SELECTOR, "a.listing-card__inner").get_attribute("href")
             house_urls.append(url)
             house_title = house.find_element(By.CLASS_NAME, "listing-card__header__title").text
@@ -136,13 +137,13 @@ def single_page_data_collection(url):
             print("something wrong ", e)
         #refind them after clicking back
     print(single_page_data)
-    collect_each_house_description(driver, single_page_data)
+    collect_each_house_description(driver, house_urls, single_page_data)
     driver.quit()
     return single_page_data
 
-def collect_each_house_description(driver, page_data):
+def collect_each_house_description(driver, page_urls, page_data):
 
-    for index, url in enumerate (house_urls):
+    for index, url in enumerate (page_urls):
         time.sleep(random.randint(1, 12))
         driver.get(url)
         wait = WebDriverWait(driver, 50)
@@ -154,6 +155,7 @@ def collect_each_house_description(driver, page_data):
         ).text
         page_data[index]["description"] = description_div
         time.sleep(random.randint(1, 12))
+
 
 def navigate_over_pages(web_url, max_pages=2):
     for page in range(1, max_pages+1):

@@ -1,3 +1,7 @@
+import random
+import time
+
+from absl.logging import exception
 from fake_useragent import UserAgent
 from selenium_stealth import stealth
 import undetected_chromedriver as uc
@@ -27,7 +31,8 @@ proxy_string = f"{proxy_host}:{proxy_port}"  #cc-us-city-new_york-sessid-test123
 app = FastAPI()
 
 #url = "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos?q=for-rent+flats-apartments+lagos&"
-
+data = []
+main_url = "https://nigeriapropertycentre.com/"
 def initialize_driver():
     
     chrome_options = webdriver.ChromeOptions()
@@ -59,15 +64,89 @@ def initialize_driver():
             renderer="Intel Iris OpenGL",
             fix_hairline=True)
     return driver
-    
 
+
+def all_pages_looping(url, max_pages = 2):
+    for  i in range(1 , max_pages +1) # as pages do not start from zero
+        try:
+            data.append(scrape_single_page(url))
+        except Exception as e:
+            print(e, "from all_pages_looping")
+    return data
+
+def scrape_single_page(url):
+    single_page_data = []
+    single_page_urls = []
+    driver = initialize_driver()
+    wait = WebDriverWait(driver, 35)
+    driver.get(url)
+    house_blocks = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "wp-block-body")))
+    for index, house in enumerate(house_blocks):
+        details = {"real_title": house.find_elements(By.CLASS_NAME, "content-title")[index].text,
+                   "real_currency": house.find_elements(By.CLASS_NAME, "price")[index * 2].text,
+                   "real_price": house.find_elements(By.CLASS_NAME, "price")[(index * 2) + 1].text,
+                   "house_url": main_url + house.find_elements(By.CSS_SELECTOR, ".wp-block-content  a")[
+                       0].get_attribute("href")}
+        single_page_urls.append(details["house_url"])
+        single_page_data.append([details])
+
+    collect_each_house_details(driver, single_page_urls, single_page_data)
+
+    driver.quit()
+    return single_page_data
+
+
+
+def collect_each_house_details(driver, page_urls, page_details):
+    for index, url in enumerate(page_urls):
+        driver.get(url)
+        time.sleep(random.randint(3, 12))
+        details_tab = driver.find_element(By.CSS_SELECTOR, 'ul.tabs li a[href="#tab-1"]')
+        driver.execute_script("arguments[0].scrollIntoView(true);", details_tab)
+
+        data = {
+            "description": "",
+            "details": {}
+        }
+
+        try:
+            # ✅ Extract Property Description (handles multi-line text and <br>)
+            desc_el = driver.find_element(By.CSS_SELECTOR, "p[itemprop='description']")
+            # Replace <br> with newline to preserve formatting
+            description_html = desc_el.get_attribute("innerHTML")
+            description_text = description_html.replace("<br>", "\n").replace("<br/>", "\n").strip()
+            # Clean up multiple spaces/newlines
+            page_details[index]["description"] = ' '.join(description_text.split())
+        except NoSuchElementException:
+            page_details[index]["description"] = None
+
+        try:
+            # ✅ Extract Property Details table key-value pairs
+            rows = driver.find_elements(By.CSS_SELECTOR, "table.table.table-bordered.table-striped tr")
+            details = {}
+            for row in rows:
+                cells = row.find_elements(By.TAG_NAME, "td")
+                for cell in cells:
+                    # Each cell looks like: <strong>Key:</strong> Value
+                    strongs = cell.find_elements(By.TAG_NAME, "strong")
+                    if strongs:
+                        key = strongs[0].text.replace(":", "").strip()
+                        # Get text excluding the <strong> element
+                        # Remove the key from the cell text to isolate value
+                        value = cell.text.replace(strongs[0].text, "").strip(" :\n\t")
+                        if key:
+                            details[key] = value if value else None
+                        current_url = driver.current_url
+                        details["current_url"] = current_url  # getting house url directly
+            page_details[index]["details"] = details
+        except NoSuchElementException:
+            page_details[index]["details"] = {}
+    return page_details # every page with every house full details
+
+"""
 def scrape_property_details(driver,real_title, real_currency, real_price):
     details_tab = driver.find_element(By.CSS_SELECTOR, 'ul.tabs li a[href="#tab-1"]')
-    """
-    WebDriverWait(driver, 360).until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, 'ul.tabs li a[href="#tab-1"]'))
-    )
-    """
+
     driver.execute_script("arguments[0].scrollIntoView(true);", details_tab)
 
     driver.execute_script("arguments[0].click();", details_tab)
@@ -113,7 +192,9 @@ def scrape_property_details(driver,real_title, real_currency, real_price):
         data["details"] = {}
 
     return data
+"""
 # harvest specific number of pages or all pages(25)
+"""
 def harvest_apartments(start_url: str, max_pages: int=1):
     apartments = []  # List to store all apartment data
 
@@ -224,7 +305,7 @@ def harvest_apartments(start_url: str, max_pages: int=1):
             print(f"failed to load the url{start_url}: {e}")
 
     return apartments  # return the results!
-
+"""
 app.include_router(dakarta.router)
 @app.get("/neigeria")
 def scrape(
@@ -233,9 +314,9 @@ def scrape(
 ):
 
     """
-    Call:  GET /scrape?url=https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos?q=for-rent+flats-apartments+lagos&
+    Call:  GET /neigeria?url=https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos?q=for-rent+flats-apartments+lagos&
     """
-    return harvest_apartments(url, max_page)
+    return all_pages_looping(url, max_page)
 
 
 
