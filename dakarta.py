@@ -104,7 +104,6 @@ def single_page_data_collection(url):
     house_urls = []
 
     driver.get(url)
-    time.sleep(10)
     handle_popups(driver, 5)
     house_blocks = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "listings-cards__list-item")))
 
@@ -144,10 +143,10 @@ def single_page_data_collection(url):
 def collect_each_house_description(driver, page_urls, page_data):
 
     for index, url in enumerate (page_urls):
-        time.sleep(random.randint(1, 12))
+        time.sleep(random.randint(1, 5))
         driver.get(url)
-        wait = WebDriverWait(driver, 50)
-        time.sleep(random.randint(1, 12))
+        wait = WebDriverWait(driver, 10)
+        time.sleep(random.randint(1, 5))
 
         # ✅ Wait until the <div class="listing-item__description"> is visible
         description_div = wait.until(
