@@ -34,7 +34,7 @@ def initialize_driver():
         {"profile.default_content_setting_values.notifications": 2}
     )
 
-    driver = uc.Chrome(options=options, headless=True)
+    driver = uc.Chrome(options=options, headless=False)
 
     return driver
 def split_price_currency(price_currency: str):
