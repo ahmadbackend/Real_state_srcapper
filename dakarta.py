@@ -38,10 +38,6 @@ def initialize_driver():
     driver = uc.Chrome(options=options, headless=False)
 
     return driver
-
-
-
-
 def split_price_currency(price_currency: str):
     # Remove normal & non-breaking spaces
     cleaned = price_currency.replace("\u202f", "").replace(" ", "")
@@ -96,14 +92,12 @@ def handle_popups(driver, timeout=5):
                 "ins.bn.bn--970-90.search-bn.search-bn--desktop-header"  # adjust if needed
             ))
         )
-        #ActionChains(driver).context_click(empty_area).perform()
-        ActionChains(driver).send_keys(Keys.ESCAPE).perform()
+        ActionChains(driver).context_click(empty_area).perform()
+        #ActionChains(driver).send_keys(Keys.ESCAPE).perform()
 
         print("[✔] Google Translate dismissed by right-click")
     except Exception as e:
         print("[i] No Google Translate banner found", e)
-
-
 def single_page_data_collection(url):
     single_page_data = []
     driver = initialize_driver()
@@ -111,7 +105,7 @@ def single_page_data_collection(url):
 
     driver.get(url)
     time.sleep(10)
-    handle_popups(driver, 50)
+    handle_popups(driver, 20)
     house_blocks = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "listings-cards__list-item")))
 
     for house in house_blocks:
@@ -137,12 +131,13 @@ def single_page_data_collection(url):
             details["url"] = url
             single_page_data.append(details)
             #print(details)
+
         except Exception as e:
             print("something wrong ", e)
         #refind them after clicking back
-        collect_each_house_description(driver, single_page_data)
+    print(single_page_data)
+    collect_each_house_description(driver, single_page_data)
     driver.quit()
-
     return single_page_data
 
 def collect_each_house_description(driver, page_data):
@@ -164,14 +159,19 @@ def navigate_over_pages(web_url, max_pages=2):
     for page in range(1, max_pages+1):
         url = f"{web_url}?page={page}" if page >1 else web_url
         data.append(single_page_data_collection(url))
+        print(data)
+
+    return data
 
 
 router = APIRouter(
     prefix="/dakarta",
     tags = ["Dakarta"]  # For Swagger grouping
 )
-
+navigate_over_pages("https://www.expat-dakar.com/appartements-a-louer/dakar", 1)
+"""
 @router.get("/")
 def get_data(url: str = Query(..., description="Listing URL to scrape"),
         max_page: int = Query(3, description="Maximum number of pages to scrape") ):
     return navigate_over_pages(url, max_page)
+"""
