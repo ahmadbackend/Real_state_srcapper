@@ -70,8 +70,8 @@ def handle_popups(driver, timeout=5):
         )
         cookies_btn.click()
         print("[✔] Cookies accepted")
-    except TimeoutException:
-        print("[i] No cookies popup found")
+    except Exception as e:
+        print("[i] No cookies popup found", e)
 
 
 
@@ -84,8 +84,8 @@ def handle_popups(driver, timeout=5):
         )
         notif_btn.click()
         print("[✔] Notification request accepted/dismissed")
-    except TimeoutException:
-        print("[i] No HTML notification popup found")
+    except Exception as e:
+        print("[i] No HTML notification popup found", e)
 
     # 1️⃣ Google Translate bar (example selector)
     try:
@@ -96,12 +96,12 @@ def handle_popups(driver, timeout=5):
                 "ins.bn.bn--970-90.search-bn.search-bn--desktop-header"  # adjust if needed
             ))
         )
-        ActionChains(driver).context_click(empty_area).perform()
+        #ActionChains(driver).context_click(empty_area).perform()
         ActionChains(driver).send_keys(Keys.ESCAPE).perform()
 
         print("[✔] Google Translate dismissed by right-click")
-    except TimeoutException:
-        print("[i] No Google Translate banner found")
+    except Exception as e:
+        print("[i] No Google Translate banner found", e)
 
 
 def single_page_data_collection(url):
@@ -111,7 +111,7 @@ def single_page_data_collection(url):
 
     driver.get(url)
     time.sleep(10)
-    handle_popups(driver, 15)
+    handle_popups(driver, 50)
     house_blocks = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "listings-cards__list-item")))
 
     for house in house_blocks:
