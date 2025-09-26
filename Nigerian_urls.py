@@ -1,5 +1,8 @@
 from fake_useragent import UserAgent
 from selenium_stealth import stealth
+import undetected_chromedriver as uc
+
+import dakarta
 
 ua = UserAgent()
 from decouple import  config
@@ -26,32 +29,50 @@ app = FastAPI()
 #url = "https://nigeriapropertycentre.com/for-rent/flats-apartments/lagos?q=for-rent+flats-apartments+lagos&"
 
 def initialize_driver():
+    """
     chrome_options = webdriver.ChromeOptions()
     #chrome_options.add_argument('--headless=new')
     chrome_options.add_argument('--lang=en-US,en;q=0.9')
 
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
-    chrome_options.add_argument(f'user-agent={ua.random}')
+    #chrome_options.add_argument(f'user-agent={ua.random}')
     # Disable WebRTC
-    chrome_options.add_argument('--disable-webrtc')
-    chrome_options.add_experimental_option('prefs', {'webrtc.ip_handling_policy': 'disable_non_proxied_udp'})
-    chrome_options.add_experimental_option('prefs', {'webrtc.multiple_routes_enabled': False})
+
+    #chrome_options.add_argument('--disable-webrtc')
+    #chrome_options.add_experimental_option('prefs', {'webrtc.ip_handling_policy': 'disable_non_proxied_udp'})
+    #chrome_options.add_experimental_option('prefs', {'webrtc.multiple_routes_enabled': False})
     #chrome_options.add_argument(f'--proxy-server=https://{proxy_string}')
     chrome_options.add_argument('--disable-crash-reporter')
     chrome_options.add_argument('--no-crash-upload')
-    chrome_options.add_argument("--blink-settings=imagesEnabled=false")
-
+    #chrome_options.add_argument("--blink-settings=imagesEnabled=false")
+    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--enable-webgl")
+    chrome_options.add_argument("--enable-gpu")
 
     driver = webdriver.Chrome( options=chrome_options)
     stealth(driver,
             languages=["en-US", "en"],
             vendor="Google Inc.",
-            platform="Win32",
+            platform="Win64",
             webgl_vendor="Intel Inc.",
             renderer="Intel Iris OpenGL",
             fix_hairline=True)
     return driver
+    """
+
+    options = uc.ChromeOptions()
+    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--lang=en-US,en;q=0.9")
+    options.add_experimental_option(
+        "prefs",
+        {"profile.default_content_setting_values.notifications": 2}
+    )
+
+    driver = uc.Chrome(options=options, headless=False)
+
+    return driver
+
 
 def scrape_property_details(driver,real_title, real_currency, real_price):
     details_tab = driver.find_element(By.CSS_SELECTOR, 'ul.tabs li a[href="#tab-1"]')
@@ -217,8 +238,8 @@ def harvest_apartments(start_url: str, max_pages: int=1):
 
     return apartments  # return the results!
 
-
-@app.get("/scrape")
+app.include_router(dakarta.router)
+@app.get("/neigeria")
 def scrape(
     url: str = Query(..., description="Listing URL to scrape"),
     max_page: int = Query(1, description="Maximum number of pages to scrape")  #  default = 25
