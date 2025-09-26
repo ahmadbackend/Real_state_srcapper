@@ -105,7 +105,7 @@ def single_page_data_collection(url):
 
     driver.get(url)
     time.sleep(10)
-    handle_popups(driver, 20)
+    handle_popups(driver, 5)
     house_blocks = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "listings-cards__list-item")))
 
     for house in house_blocks:
@@ -170,7 +170,7 @@ router = APIRouter(
     prefix="/dakarta",
     tags = ["Dakarta"]  # For Swagger grouping
 )
-
+navigate_over_pages("", 3)
 @router.get("/")
 def get_data(url: str = Query(..., description="Listing URL to scrape"),
         max_page: int = Query(3, description="Maximum number of pages to scrape") ):
