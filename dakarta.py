@@ -170,10 +170,8 @@ router = APIRouter(
     prefix="/dakarta",
     tags = ["Dakarta"]  # For Swagger grouping
 )
-navigate_over_pages("https://www.expat-dakar.com/appartements-a-louer/dakar", 1)
-"""
+
 @router.get("/")
 def get_data(url: str = Query(..., description="Listing URL to scrape"),
         max_page: int = Query(3, description="Maximum number of pages to scrape") ):
     return navigate_over_pages(url, max_page)
-"""
