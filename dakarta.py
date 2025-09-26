@@ -1,23 +1,18 @@
-import time
-from fastapi import  APIRouter
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains # for right clikc
 import  time, random
-from fake_useragent import UserAgent
-from selenium_stealth import stealth
-
-ua = UserAgent()
-from decouple import  config
-from selenium import  webdriver
+import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait, Select
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+import re
 
-from selenium.common.exceptions import NoSuchElementException
-#fastapi for converting it to api endpoint
-from fastapi import FastAPI, Query
+from decouple import  config
+from fastapi import  Query, APIRouter
+
+
 # setting proxy config
-from Nigerian_urls import  initialize_driver
 proxy_host = config("PROXY_HOST")
 proxy_port = config("PROXY_PORT")
 proxy_user = config("proxy_user")
@@ -25,15 +20,27 @@ proxy_pass = config("proxy_pass")
 proxy_string = f"{proxy_host}:{proxy_port}"  #cc-us-city-new_york-sessid-test123.bc.pr.oxylabs.io:7777# Add proxy
 # Add proxy authentication via extension
 #method to handle initial slide pop up
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
-import re
 
 
 house_urls=[]
 data = []
+def initialize_driver():
+
+
+    options = uc.ChromeOptions()
+    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--lang=en-US,en;q=0.9")
+    options.add_experimental_option(
+        "prefs",
+        {"profile.default_content_setting_values.notifications": 2}
+    )
+
+    driver = uc.Chrome(options=options, headless=False)
+
+    return driver
+
+
+
 
 def split_price_currency(price_currency: str):
     # Remove normal & non-breaking spaces
