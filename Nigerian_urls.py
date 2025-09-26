@@ -66,11 +66,13 @@ def initialize_driver():
 
 
 def all_pages_looping(url, max_pages = 2):
-    for  i in range(1 , max_pages +1): # as pages do not start from zero
+    for  i in range(1, max_pages +1): # as pages do not start from zero
         try:
-            data.append(scrape_single_page(url))
+            url_to_scrape = url+f"&page={i}" if i > 1 else url
+            data.append(scrape_single_page(url_to_scrape))
         except Exception as e:
             print(e, "from all_pages_looping")
+        print(data)
     return data
 
 def scrape_single_page(url):
@@ -79,18 +81,24 @@ def scrape_single_page(url):
     driver = initialize_driver()
     wait = WebDriverWait(driver, 35)
     driver.get(url)
-    house_blocks = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "wp-block-body")))
-    for index, house in enumerate(house_blocks):
-        details = {"real_title": house.find_elements(By.CLASS_NAME, "content-title")[index].text,
-                   "real_currency": house.find_elements(By.CLASS_NAME, "price")[index * 2].text,
-                   "real_price": house.find_elements(By.CLASS_NAME, "price")[(index * 2) + 1].text,
-                   "house_url": main_url + house.find_elements(By.CSS_SELECTOR, ".wp-block-content  a")[
-                       0].get_attribute("href")}
-        single_page_urls.append(details["house_url"])
-        single_page_data.append([details])
+    time.sleep(random.randint(5, 20))
+    try:
 
-    collect_each_house_details(driver, single_page_urls, single_page_data)
+        house_blocks = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "wp-block-body")))
+        for index, house in enumerate(house_blocks):
+            details = {"real_title": house.find_element(By.CLASS_NAME, "content-title").text,
+                       "real_currency": house.find_elements(By.CLASS_NAME, "price")[0].text,
+                       "real_price": house.find_elements(By.CLASS_NAME, "price")[1].text,
+                       "house_url": house.find_elements(By.CSS_SELECTOR, ".wp-block-content a")[
+                           0].get_attribute("href")}
+            single_page_urls.append(details["house_url"])
+            print(details)
+            single_page_data.append(details)
 
+
+        collect_each_house_details(driver, single_page_urls, single_page_data)
+    except Exception as e:
+        print(e, "scrape_single_page")
     driver.quit()
     return single_page_data
 
@@ -100,8 +108,7 @@ def collect_each_house_details(driver, page_urls, page_details):
     for index, url in enumerate(page_urls):
         driver.get(url)
         time.sleep(random.randint(3, 12))
-        details_tab = driver.find_element(By.CSS_SELECTOR, 'ul.tabs li a[href="#tab-1"]')
-        driver.execute_script("arguments[0].scrollIntoView(true);", details_tab)
+
 
         data = {
             "description": "",
@@ -140,6 +147,8 @@ def collect_each_house_details(driver, page_urls, page_details):
             page_details[index]["details"] = details
         except NoSuchElementException:
             page_details[index]["details"] = {}
+        except Exception as e:
+            print(e, "collect_each_house")
     return page_details # every page with every house full details
 
 """
