@@ -1,7 +1,6 @@
 import random
 import time
 
-from absl.logging import exception
 from fake_useragent import UserAgent
 from selenium_stealth import stealth
 import undetected_chromedriver as uc
