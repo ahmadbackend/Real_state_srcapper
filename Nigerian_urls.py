@@ -67,7 +67,7 @@ def initialize_driver():
 
 
 def all_pages_looping(url, max_pages = 2):
-    for  i in range(1 , max_pages +1) # as pages do not start from zero
+    for  i in range(1 , max_pages +1): # as pages do not start from zero
         try:
             data.append(scrape_single_page(url))
         except Exception as e:
