@@ -74,7 +74,11 @@ def all_pages_looping(url, max_pages = 2):
         except Exception as e:
             print(e, "from all_pages_looping")
         print(data)
-    return data
+    flat = []
+    for sublist in data:
+        for item in sublist:
+            flat.append(item)
+    return flat
 
 def scrape_single_page(url):
     single_page_data = []
