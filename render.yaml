@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: fastapi-app
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerCommand: "./start.sh"
+
+
+  - type: worker
+    name: celery-worker
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerCommand: "./worker.sh"
+
+databases:
+  - name: redis
+    plan: free
+    ipAllowList: []

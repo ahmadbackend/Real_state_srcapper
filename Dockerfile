@@ -32,7 +32,7 @@ RUN CHROME_VERSION=$(chromium --version | awk '{print $2}' | cut -d'.' -f1) \
 COPY . .
 
 # Make entrypoint script executable
-RUN chmod +x ./start.sh
+RUN chmod +x ./start.sh ./worker.sh
 
 # Optional: expose a default port (Render expects the process to bind $PORT)
 EXPOSE 8000
