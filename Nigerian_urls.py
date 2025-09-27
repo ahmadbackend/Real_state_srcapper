@@ -88,7 +88,7 @@ def scrape_single_page(url):
     wait = WebDriverWait(driver, 35)
     driver.get(url)
     real_city = driver.find_element(By.CLASS_NAME, "page-title").text.split(" ")[-1] # last word is the city name
-    real_listing_type = driver.find_element(By.CLASS_NAME, "page-title").text.split(" ")[2]
+    real_listing_type = driver.find_element(By.CLASS_NAME, "page-title").text.split(" ")[4]
     real_asset_type = driver.find_element(By.CLASS_NAME, "page-title").text.split(" ")[1]
     time.sleep(random.randint(5, 20))
     try:
