@@ -104,7 +104,8 @@ def single_page_data_collection(url):
     house_urls = []
 
     driver.get(url)
-    handle_popups(driver, 5)
+    time.sleep((random.randint(20, 50)))
+    #handle_popups(driver, 5)
     house_blocks = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "listings-cards__list-item")))
 
     for house in house_blocks:
