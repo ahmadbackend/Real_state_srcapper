@@ -73,7 +73,7 @@ def scrape_single_page(url):
     driver = initialize_driver()
     wait = WebDriverWait(driver, 35)
     driver.get(url)
-    time.sleep(random.randint(5, 20))
+    time.sleep(random.randint(15,25))
     try:
 
         house_blocks = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "wp-block-body")))
