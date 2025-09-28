@@ -157,8 +157,8 @@ def collect_each_house_description(driver, page_urls, page_data):
                 EC.visibility_of_element_located((By.CSS_SELECTOR, ".listing-item__description p"))
             ).text
             page_data[index]["description"] = description_div
-            page_data[index]["rooms"] = driver.find_elements(By.CSS_SELECTOR, "listing-item__properties__description")[0].text
-            page_data[index]["bathrooms"] = driver.find_elements(By.CSS_SELECTOR, "listing-item__properties__description")[1].text
+            page_data[index]["rooms"] = driver.find_elements(By.CLASS_NAME, "listing-item__properties__description")[0].text
+            page_data[index]["bathrooms"] = driver.find_elements(By.CLASS_NAME, "listing-item__properties__description")[1].text
             time.sleep(random.randint(1, 12))
         except Exception as e:
             print("collect_each_house_description")
