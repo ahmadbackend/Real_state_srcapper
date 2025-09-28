@@ -66,7 +66,7 @@ def handle_popups(driver, timeout=5):
         cookies_btn.click()
         print("[✔] Cookies accepted")
     except Exception as e:
-        print("[i] No cookies popup found", e)
+        print("[i] No cookies popup found")
 
 
 
@@ -80,7 +80,7 @@ def handle_popups(driver, timeout=5):
         notif_btn.click()
         print("[✔] Notification request accepted/dismissed")
     except Exception as e:
-        print("[i] No HTML notification popup found", e)
+        print("[i] No HTML notification popup found")
 
     # 1️⃣ Google Translate bar (example selector)
     try:
@@ -98,7 +98,7 @@ def handle_popups(driver, timeout=5):
 
         print("[✔] Google Translate dismissed by right-click")
     except Exception as e:
-        print("[i] No Google Translate banner found", e)
+        print("[i] No Google Translate banner found")
 def single_page_data_collection(url):
     single_page_data = []
     driver = initialize_driver()
@@ -146,24 +146,32 @@ def single_page_data_collection(url):
 def collect_each_house_description(driver, page_urls, page_data):
 
     for index, url in enumerate (page_urls):
-        time.sleep(random.randint(1, 5))
-        driver.get(url)
-        wait = WebDriverWait(driver, 10)
-        time.sleep(random.randint(1, 5))
+        try:
+            time.sleep(random.randint(1, 5))
+            driver.get(url)
+            wait = WebDriverWait(driver, 10)
+            time.sleep(random.randint(1, 5))
 
-        # ✅ Wait until the <div class="listing-item__description"> is visible
-        description_div = wait.until(
-            EC.visibility_of_element_located((By.CSS_SELECTOR, ".listing-item__description p"))
-        ).text
-        page_data[index]["description"] = description_div
-        time.sleep(random.randint(1, 12))
+            # ✅ Wait until the <div class="listing-item__description"> is visible
+            description_div = wait.until(
+                EC.visibility_of_element_located((By.CSS_SELECTOR, ".listing-item__description p"))
+            ).text
+            page_data[index]["description"] = description_div
+            page_data[index]["rooms"] = driver.find_elements(By.CSS_SELECTOR, "listing-item__properties__description")[0].text
+            page_data[index]["bathrooms"] = driver.find_elements(By.CSS_SELECTOR, "listing-item__properties__description")[1].text
+            time.sleep(random.randint(1, 12))
+        except Exception as e:
+            print("collect_each_house_description")
 
 
 def navigate_over_pages(web_url, max_pages=2):
-    for page in range(1, max_pages+1):
-        url = f"{web_url}?page={page}" if page >1 else web_url
-        data.append(single_page_data_collection(url))
-        print(data)
+    try:
+        for page in range(1, max_pages+1):
+            url = f"{web_url}?page={page}" if page >1 else web_url
+            data.append(single_page_data_collection(url))
+            #print(data)
+    except Exception as e:
+        print("navigate_over_pages", e)
 
 
     flat = []
