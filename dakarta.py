@@ -165,7 +165,13 @@ def navigate_over_pages(web_url, max_pages=2):
         data.append(single_page_data_collection(url))
         print(data)
 
-    return data
+
+    flat = []
+    for sublist in data:
+        for item in sublist:
+            flat.append(item)
+    return flat
+
 
 
 router = APIRouter(
