@@ -91,8 +91,10 @@ def handle_popups(driver, timeout=5):
                 "ins.bn.bn--970-90.search-bn.search-bn--desktop-header"  # adjust if needed
             ))
         )
-        ActionChains(driver).context_click(empty_area).perform()
-        #ActionChains(driver).send_keys(Keys.ESCAPE).perform()
+        #ActionChains(driver).context_click(empty_area).perform()
+        #ActionChains(driver).context_click(empty_area).perform()
+
+        ActionChains(driver).send_keys(Keys.ESCAPE).perform()
 
         print("[✔] Google Translate dismissed by right-click")
     except Exception as e:

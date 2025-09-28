@@ -66,6 +66,7 @@ def initialize_driver():
 
 
 def all_pages_looping(url, max_pages = 2):
+    
     for  i in range(1, max_pages +1): # as pages do not start from zero
         try:
             url_to_scrape = url+f"&page={i}" if i > 1 else url
@@ -74,14 +75,22 @@ def all_pages_looping(url, max_pages = 2):
             print(e, "from all_pages_looping")
         print(data)
 
-    return data
+    flat = []
+    for sublist in data:
+        for item in sublist:
+            flat.append(item)
+    return flat
 
 def scrape_single_page(url):
     single_page_data = []
+    
     single_page_urls = []
     driver = initialize_driver()
     wait = WebDriverWait(driver, 35)
     driver.get(url)
+    real_city = driver.find_element(By.CLASS_NAME, "page-title").text.split(" ")[-1] # last word is the city name
+    real_listing_type = driver.find_element(By.CLASS_NAME, "page-title").text.split(" ")[4]
+    real_asset_type = driver.find_element(By.CLASS_NAME, "page-title").text.split(" ")[1]
     time.sleep(random.randint(5, 20))
     try:
 
@@ -90,6 +99,9 @@ def scrape_single_page(url):
             details = {"real_title": house.find_element(By.CLASS_NAME, "content-title").text,
                        "real_currency": house.find_elements(By.CLASS_NAME, "price")[0].text,
                        "real_price": house.find_elements(By.CLASS_NAME, "price")[1].text,
+                       "real_city":real_city,
+                       "real_listing_type":real_listing_type,
+                       "real_asset_type":real_asset_type,
                        "house_url": house.find_elements(By.CSS_SELECTOR, ".wp-block-content a")[
                            0].get_attribute("href")}
             single_page_urls.append(details["house_url"])
