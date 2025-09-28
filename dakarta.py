@@ -102,7 +102,7 @@ def handle_popups(driver, timeout=5):
 def single_page_data_collection(url):
     single_page_data = []
     driver = initialize_driver()
-    wait = WebDriverWait(driver, 2400)  # wait up to 50 seconds
+    wait = WebDriverWait(driver, 240)  # wait up to 50 seconds
     house_urls = []
 
     driver.get(url)
