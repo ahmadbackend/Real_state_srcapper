@@ -102,12 +102,12 @@ def handle_popups(driver, timeout=5):
 def single_page_data_collection(url):
     single_page_data = []
     driver = initialize_driver()
-    wait = WebDriverWait(driver, 50)  # wait up to 50 seconds
+    wait = WebDriverWait(driver, 2400)  # wait up to 50 seconds
     house_urls = []
 
     driver.get(url)
-    time.sleep((random.randint(20, 50)))
-    #handle_popups(driver, 5)
+    time.sleep(30)
+    handle_popups(driver, 20)
     house_blocks = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "listings-cards__list-item")))
 
     for house in house_blocks:
