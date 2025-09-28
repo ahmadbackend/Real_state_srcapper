@@ -23,6 +23,21 @@ proxy_string = f"{proxy_host}:{proxy_port}"  #cc-us-city-new_york-sessid-test123
 
 
 data = []
+from selenium.webdriver.common.by import By
+
+def extract_properties(dl_element):
+    """Extracts key-value pairs from a <dl> of property info into a dict"""
+    detail_part = {}
+    keys = dl_element.find_elements(By.CLASS_NAME, "listing-item__properties__title")
+    values = dl_element.find_elements(By.CLASS_NAME, "listing-item__properties__description")
+
+    for key, val in zip(keys, values):
+        key_text = key.get_attribute("textContent").strip()
+        val_text = val.get_attribute("textContent").strip()
+        data[key_text] = val_text
+
+    return detail_part
+
 def initialize_driver():
 
 
@@ -159,9 +174,10 @@ def collect_each_house_description(driver, page_urls, page_data):
             page_data[index]["description"] = description_div
             dl_element = driver.find_element(By.CLASS_NAME, "listing-item__properties")
             descriptions = dl_element.find_elements(By.CLASS_NAME, "listing-item__properties__description")
+            details_area = extract_properties(dl_element)
             
-            page_data[index]["rooms"] = descriptions[0].get_attribute("textContent").strip()
-            page_data[index]["bathrooms"] = descriptions[1].get_attribute("textContent").strip()
+            page_data[index]["details_area"] = details_area #descriptions[0].get_attribute("textContent").strip()
+            #page_data[index]["bathrooms"] = descriptions[1].get_attribute("textContent").strip()
 
             time.sleep(random.randint(1, 12))
         except Exception as e:
