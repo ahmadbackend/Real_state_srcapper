@@ -48,6 +48,7 @@ def initialize_driver():
         "prefs",
         {"profile.default_content_setting_values.notifications": 2}
     )
+    options.add_argument(f"--proxy-server={proxy_string}")
 
     driver = uc.Chrome(options=options, headless=False)
 
