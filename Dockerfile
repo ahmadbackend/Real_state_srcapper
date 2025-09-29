@@ -33,6 +33,8 @@ COPY . .
 
 # Make entrypoint script executable
 RUN chmod +x ./start.sh
+RUN apt-get update && apt-get install -y ffmpeg
+
 
 # Optional: expose a default port (Render expects the process to bind $PORT)
 EXPOSE 8000
